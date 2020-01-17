@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>高度自适应的输入框</title>
+    <script>
+      (function(win, doc) {
+        function setHTMLFontSize() {
+          win.virtualWidth =
+            doc.documentElement.clientWidth || doc.body.clientWidth;
+          win.virtualHeight =
+            doc.documentElement.clientHeight || doc.body.clientHeight;
+          var e = (win.virtualWidth / 375) * 100;
+          if (doc.documentElement) {
+            doc.documentElement.style.fontSize = e + "px";
+          }
+        }
+        setHTMLFontSize();
+        win.addEventListener("resize", setHTMLFontSize);
+      })(window, document);
+    </script>
+    <style>
+      body,
+      html {
+        padding-left: 0.1rem;
+        margin: 0;
+      }
+      .auto-input {
+        display: block;
+        box-sizing: border-box;
+        outline: none;
+        resize: none;
+        padding: 0;
+        width: 2rem;
+        min-height: 90px;
+        border: 1px solid #000;
+        font-size: 0.2rem;
+      }
+      .title {
+        font-size: 0.2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="title">contenteditable实现的高度自适应输入框</h1>
+    <div class="auto-input" contenteditable="true" id="auto-input"></div>
+
+    <h1 class="title">textarea js高度自适应输入框</h1>
+    <textarea class="auto-input" id="autoInput"></textarea>
+  </body>
+    <script>
+    var autoInput = document.getElementById("autoInput");
+
+    /***进展1：获取scrollTop并赋值***/
+    //   autoInput.addEventListener("input", function() {
+    //         var inputScrollTop = autoInput.scrollTop;
+    //         var inputHeight = autoInput.offsetHeight;
+    //         console.log("inputScrollTop:"+inputScrollTop+'px');
+    //         autoInput.style.height = inputScrollTop + inputHeight + "px";
+    //   });
+    /*************end****************/
+
+    /***进展2：增加定时器延缓执行***/
+    //   autoInput.addEventListener("input", function() {
+    //       setTimeout(()=>{
+    //         var inputScrollTop = autoInput.scrollTop;
+    //         var inputHeight = autoInput.offsetHeight;
+    //         console.log("inputScrollTop:"+inputScrollTop+'px');
+    //         autoInput.style.height = inputScrollTop + inputHeight + "px";
+    //       },0)
+    //   });
+    /************end***************/
+
+
+    /***进展3：获取元素的scrollHeight并设置高度***/
+    // autoInput.addEventListener("input", function() {
+    //   var inputScrollHeight = autoInput.scrollHeight + 2;
+    //     console.log("inputScrollHeight" + inputScrollHeight+"px");
+    //     autoInput.style.height = autoInput.scrollHeight + "px";
+    //   });
+    /*****************   end **************/
+
+
+    /***进展4：重置元素的高度***/
+    // autoInput.addEventListener("input", function() {
+    //     autoInput.style.height = "";
+    //     var inputScrollHeight = autoInput.scrollHeight + 2;
+    //     console.log("inputScrollHeight" + inputScrollHeight+"px");
+    //     autoInput.style.height = inputScrollHeight + "px";
+    //   });
+    /*****************   end **************/
+
+
+    /***进展5：优化方案***/
+    var lastScrollHeight = autoInput.scrollHeight;
+    var lastTextLength = autoInput.value.length;
+    autoInput.addEventListener("input", function() {
+        var inputTextLength = autoInput.value.length;
+        if (inputTextLength < lastTextLength){
+            console.log("文字减少")
+            autoInput.style.height = "auto";
+        }
+        //注意这句话一定要写在设置height为空的后面，否则获取不到最新的scrollHeight
+        var inputScrollHeight = autoInput.scrollHeight;
+        //注意如果height为空的话也需要重置高度 否则高度有问题
+        if(lastScrollHeight < inputScrollHeight || !autoInput.style.height){
+            console.log("高度设置")
+            lastScrollHeight = inputScrollHeight;
+            autoInput.style.height = inputScrollHeight + 2 + "px";
+        }
+        lastTextLength = autoInput.value.length;
+    });
+    /*********************end***************/
+    </script>
+  </body>
+</html>
